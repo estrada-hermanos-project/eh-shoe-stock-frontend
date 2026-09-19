@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Estrada Hermanos — Calzado fino de Occidente. Zapatos tradicionales hechos a mano en Quetzaltenango." />
+  <title>Estrada Hermanos | Calzado Fino de Occidente</title>
+  <link rel="icon" href="images/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header" id="inicio">
+    <nav class="nav" aria-label="Principal">
+      <a class="nav__brand" href="#inicio">
+        <img src="images/logo.jpg" alt="Estrada Hermanos" width="52" height="52" />
+      </a>
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir menú">
+        <span></span><span></span>
+      </button>
+      <ul class="nav__menu" id="nav-menu">
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#coleccion">Colección</a></li>
+        <li><a href="#tradicion">Tradición</a></li>
+        <li>
+          <a class="nav__access" href="acceso.html" title="Acceso de administrador">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+            Acceso
+          </a>
+        </li>
+        <li><a class="nav__cta" href="#visita">Visítanos</a></li>
+      </ul>
+    </nav>
+
+    <section class="hero" aria-labelledby="hero-brand">
+      <div class="hero__media" aria-hidden="true">
+        <img src="images/caballero-1.jpg" alt="" />
+      </div>
+      <div class="hero__veil"></div>
+      <div class="hero__content">
+        <img class="hero__logo" src="images/logo.jpg" alt="" width="120" height="120" />
+        <h1 id="hero-brand" class="hero__brand">Estrada Hermanos</h1>
+        <p class="hero__tagline">Calzado Fino de Occidente</p>
+        <p class="hero__lead">Calzado formal hecho a mano en Quetzaltenango.</p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#visita">Visítanos</a>
+          <a class="btn btn--ghost" href="#coleccion">Ver colección</a>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="section about" id="nosotros">
+      <div class="section__inner about__grid">
+        <div class="about__copy reveal">
+          <p class="eyebrow">Nuestra historia</p>
+          <h2>Tradición artesanal desde Quetzaltenango</h2>
+          <p>
+            Más de 27 años como sala de ventas, elaborando calzado formal
+            para damas y caballeros con cuero y suela de res.
+          </p>
+          <ul class="about__facts">
+            <li><strong>+27</strong> años de trayectoria</li>
+            <li><strong>1</strong> sala de ventas</li>
+            <li><strong>100%</strong> hecho a mano</li>
+          </ul>
+        </div>
+        <figure class="about__figure reveal">
+          <img src="images/caballero-2.jpg" alt="Zapato de caballero en cuero tejido, hecho a mano" />
+        </figure>
+      </div>
+    </section>
+
+    <section class="section collection" id="coleccion">
+      <div class="section__inner">
+        <header class="section__header reveal">
+          <p class="eyebrow">Colección</p>
+          <h2>Formal para damas y caballeros</h2>
+          <p>Piezas clásicas en cuero natural, pensadas para el día a día con elegancia.</p>
+        </header>
+
+        <div class="gallery">
+          <figure class="gallery__item gallery__item--wide reveal">
+            <img src="images/coleccion.jpg" alt="Calzado de dama y caballero Estrada Hermanos" />
+            <figcaption>Dama &amp; Caballero</figcaption>
+          </figure>
+          <figure class="gallery__item reveal">
+            <img src="images/caballero-1.jpg" alt="Zapatos formales negros de caballero" />
+            <figcaption>Caballero</figcaption>
+          </figure>
+          <figure class="gallery__item reveal">
+            <img src="images/dama-4.jpg" alt="Zapatos de dama en cuero castaño" />
+            <figcaption>Dama</figcaption>
+          </figure>
+          <figure class="gallery__item reveal">
+            <img src="images/dama-3.jpg" alt="Ballerinas de cuero con detalle de moño" />
+            <figcaption>Dama</figcaption>
+          </figure>
+          <figure class="gallery__item reveal">
+            <img src="images/dama-1.jpg" alt="Mocasines de dama con detalle dorado" />
+            <figcaption>Dama</figcaption>
+          </figure>
+          <figure class="gallery__item reveal">
+            <img src="images/dama-2.jpg" alt="Zapatos de dama con tacón bajo" />
+            <figcaption>Dama</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section values" id="tradicion">
+      <div class="section__inner">
+        <header class="section__header reveal">
+          <p class="eyebrow">Nuestra esencia</p>
+          <h2>Elegancia · Comodidad · Calidad</h2>
+        </header>
+        <ul class="values__list">
+          <li class="reveal">
+            <span class="values__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><path d="M8 18c4-8 12-12 16-12s12 4 16 12c2 4 2 10-2 14-3 3-8 4-14 4s-11-1-14-4c-4-4-4-10-2-14z" stroke="currentColor" stroke-width="1.6"/><path d="M16 22h16M18 28h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+            <h3>Piel natural</h3>
+            <p>Cuero y suela de res como materia prima principal.</p>
+          </li>
+          <li class="reveal">
+            <span class="values__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><path d="M14 34V18l10-8 10 8v16" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M20 34v-8h8v8" stroke="currentColor" stroke-width="1.6"/></svg>
+            </span>
+            <h3>Diseño clásico</h3>
+            <p>Estilos formales que acompañan cada ocasión.</p>
+          </li>
+          <li class="reveal">
+            <span class="values__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><path d="M10 28c4-6 10-10 14-10s10 4 14 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 32h20M18 36h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+            <h3>Comodidad</h3>
+            <p>Calzado pensado para acompañarte todo el día.</p>
+          </li>
+          <li class="reveal">
+            <span class="values__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><path d="M24 38s-12-7-12-16a7 7 0 0 1 12-4 7 7 0 0 1 12 4c0 9-12 16-12 16z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </span>
+            <h3>Hecho en Xela</h3>
+            <p>Artesanía de Quetzaltenango, con atención personalizada.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section visit" id="visita">
+      <div class="section__inner visit__panel reveal">
+        <div class="visit__copy">
+          <p class="eyebrow">Sala de ventas</p>
+          <h2>Visítanos en Estrada Hermanos</h2>
+          <p>
+            Una sola sucursal en Quetzaltenango, donde puedes conocer de cerca
+            cada pieza elaborada por zapateros artesanos.
+          </p>
+          <dl class="visit__meta">
+            <div>
+              <dt>Ciudad</dt>
+              <dd>Quetzaltenango, Guatemala</dd>
+            </div>
+            <div>
+              <dt>Enfoque</dt>
+              <dd>Calzado formal para damas y caballeros</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="visit__visual" aria-hidden="true">
+          <img src="images/header.png" alt="" />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <img src="images/logo.jpg" alt="Estrada Hermanos" width="72" height="72" />
+        <div>
+          <p class="footer__name">Estrada Hermanos</p>
+          <p class="footer__tag">Calzado Fino de Occidente</p>
+        </div>
+      </div>
+      <p class="footer__note">Hecho con orgullo para nuestra gente.</p>
+      <p class="footer__copy">&copy; <span id="year"></span> Estrada Hermanos. Quetzaltenango. &middot; <a href="acceso.html" style="color:var(--gold-soft);border-bottom:1px solid rgba(212,184,150,.4)">Panel de gestión</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

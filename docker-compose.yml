@@ -1,0 +1,14 @@
+# Sitio estático (Nginx). El navegador llama a la API en localhost:8080.
+
+name: eh-shoe-stock-frontend
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: eh-shoe-stock-frontend:latest
+    container_name: eh-shoe-stock-frontend
+    restart: unless-stopped
+    ports:
+      - "5500:80"
