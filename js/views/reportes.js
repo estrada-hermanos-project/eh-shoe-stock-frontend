@@ -255,7 +255,7 @@ async function fillVentas(body, ctx, filters, report, start, end)
     const dama = (rows || []).find((r) => r.type === "Dama");
     html += `<div class="card"><div class="card__body">${(rows || []).length ? donut(
       dama?.share_percent || 0, `${dama?.share_percent || 0}%`, "Dama",
-      (rows || []).map((r, i) => ({ color: i ? "var(--cream-deep)" : "var(--gold)", label: r.type, val: `${formatInt(r.amount_sold)} pares` }))
+      (rows || []).map((r, i) => ({ color: i ? "var(--rosewood)" : "var(--gold)", label: r.type, val: `${formatInt(r.amount_sold)} pares` }))
     ) : empty(I.reportes, "Sin datos.")}</div></div>`;
   }
   else if (report === "size")

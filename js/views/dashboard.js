@@ -72,7 +72,7 @@ export async function renderDashboard(root, ctx)
           <div class="card__head"><div class="card__title">Ventas por categoría</div></div>
           <div class="card__body">${(categories || []).length ? donut(damaPct, `${damaPct}%`, "Dama", [
             { color: "var(--gold)", label: "Dama", val: `${formatInt(damaPairs)} pares` },
-            { color: "var(--cream-deep)", label: "Caballero", val: `${formatInt(cabPairs)} pares` },
+            { color: "var(--rosewood)", label: "Caballero", val: `${formatInt(cabPairs)} pares` },
           ]) : empty(I.reportes, "Aún no hay ventas en el período.")}</div>
         </div>
       </div>
