@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/app.css?v=panel-dark-2" />
+  <link rel="stylesheet" href="css/app.css?v=sidebar-scroll-1" />
 </head>
 <body class="is-panel">
   <script>
@@ -28,6 +28,9 @@
           <div class="sidebar__brand-tag">Panel de gestión</div>
         </div>
       </div>
+      <div class="sidebar__logout-wrap">
+        <button class="btn btn--ghost btn--block btn--sm sidebar__logout" id="logout" type="button">Cerrar sesión</button>
+      </div>
       <nav class="sidebar__nav" id="nav"></nav>
       <div class="sidebar__foot">
         <div class="health" id="api-health"><i></i> API</div>
@@ -38,7 +41,6 @@
             <div class="sidebar__user-role">Administrador</div>
           </div>
         </div>
-        <button class="btn btn--ghost btn--block btn--sm" id="logout" style="color:var(--gold-soft);border-color:rgba(184,149,106,.35)">Cerrar sesión</button>
         <a class="sidebar__site" href="index.html">Volver al sitio</a>
       </div>
     </aside>
