@@ -1,3 +1,5 @@
+export const BACKEND_HOST = "http://3.238.159.180";
+
 function defaultApiBase()
 {
   const stored = localStorage.getItem("eh.apiBase");
@@ -5,10 +7,7 @@ function defaultApiBase()
   {
     return stored;
   }
-  const host = (location.hostname === "127.0.0.1" || location.hostname === "[::1]")
-    ? "127.0.0.1"
-    : "localhost";
-  return `http://${host}:8080/api/v1`;
+  return `${BACKEND_HOST}:8080/api/v1`;
 }
 
 export const CONFIG = {
