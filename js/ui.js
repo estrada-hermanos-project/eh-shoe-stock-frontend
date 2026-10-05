@@ -26,6 +26,10 @@ export function escapeHtml(value)
     .replaceAll('"', "&quot;");
 }
 
+export const BUSINESS_ZONE = "America/Guatemala";
+
+const WEEKDAY_INDEX = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 };
+
 export function toIso(date)
 {
   const year = date.getFullYear();
@@ -34,23 +38,45 @@ export function toIso(date)
   return `${year}-${month}-${day}`;
 }
 
-export function todayIso()
+function businessParts(now)
 {
-  return toIso(new Date());
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: BUSINESS_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).formatToParts(now);
+  const value = (type) => parts.find((part) => part.type === type).value;
+  return {
+    year: Number(value("year")),
+    month: Number(value("month")),
+    day: Number(value("day")),
+    weekday: WEEKDAY_INDEX[value("weekday")],
+  };
 }
 
-export function monthStartIso()
+function isoDate(year, month, day)
 {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+  return new Date(Date.UTC(year, month - 1, day)).toISOString().slice(0, 10);
 }
 
-export function weekStartIso()
+export function todayIso(now = new Date())
 {
-  const now = new Date();
-  const day = now.getDay() || 7;
-  now.setDate(now.getDate() - day + 1);
-  return toIso(now);
+  const { year, month, day } = businessParts(now);
+  return isoDate(year, month, day);
+}
+
+export function monthStartIso(now = new Date())
+{
+  const { year, month } = businessParts(now);
+  return isoDate(year, month, 1);
+}
+
+export function weekStartIso(now = new Date())
+{
+  const { year, month, day, weekday } = businessParts(now);
+  return isoDate(year, month, day - (weekday - 1));
 }
 
 export function formatInt(n)
