@@ -27,6 +27,10 @@
         <label for="pass">Contraseña</label>
         <input type="password" id="pass" name="password" autocomplete="current-password" required />
       </div>
+      <label class="login__show-pass" for="show-pass">
+        <input type="checkbox" id="show-pass" />
+        Mostrar contraseña
+      </label>
       <p class="login__error" id="login-error" role="alert"></p>
       <button class="btn btn--primary btn--block" type="submit" id="login-submit">Ingresar al panel</button>
       <p class="login__hint">Use el usuario de cuenta, no el correo. Ejemplo: diego.estrada</p>
@@ -39,6 +43,17 @@
     import { BACKEND_HOST } from "./js/config.js";
     if (!window.__ehLoginBound)
     {
+      var passInput = document.getElementById("pass");
+      var showPass = document.getElementById("show-pass");
+      if (passInput && showPass)
+      {
+        showPass.addEventListener("change", function ()
+        {
+          var value = passInput.value;
+          passInput.type = showPass.checked ? "text" : "password";
+          passInput.value = value;
+        });
+      }
       document.getElementById("login-form").addEventListener("submit", function (event)
       {
         event.preventDefault();
@@ -48,7 +63,7 @@
         var errorEl = document.getElementById("login-error");
         var submit = document.getElementById("login-submit");
         var username = (document.getElementById("user").value || "").trim();
-        var password = document.getElementById("pass").value || "";
+        var password = passInput ? passInput.value : "";
         if (!username || !password)
         {
           errorEl.textContent = "Ingrese usuario y contraseña.";

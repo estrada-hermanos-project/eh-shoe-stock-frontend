@@ -94,6 +94,15 @@ button { font-family: inherit; cursor: pointer; }
   outline: none; border-color: var(--gold);
   box-shadow: 0 0 0 3px rgba(184, 149, 106, 0.18);
 }
+.login__show-pass {
+  display: flex; align-items: center; gap: 0.55rem;
+  margin: -0.25rem 0 1rem; text-align: left;
+  font-size: 0.92rem; color: var(--ink); cursor: pointer;
+}
+.login__show-pass input {
+  width: 1.05rem; height: 1.05rem; margin: 0; flex-shrink: 0;
+  accent-color: var(--ink); cursor: pointer;
+}
 .login__hint { font-size: 0.9rem; color: var(--ink-soft); margin-top: 1rem; }
 
 /* ============ BUTTONS ============ */
