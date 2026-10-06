@@ -13,6 +13,18 @@ import { BACKEND_HOST } from "./config.js";
 
   window.__ehLoginBound = true;
 
+  const passInput = document.getElementById("pass");
+  const showPass = document.getElementById("show-pass");
+  if (passInput && showPass)
+  {
+    showPass.addEventListener("change", function ()
+    {
+      const value = passInput.value;
+      passInput.type = showPass.checked ? "text" : "password";
+      passInput.value = value;
+    });
+  }
+
   function apiBase()
   {
     const stored = localStorage.getItem("eh.apiBase");
@@ -72,7 +84,7 @@ import { BACKEND_HOST } from "./config.js";
 
     errorEl.textContent = "";
     const username = (document.getElementById("user").value || "").trim();
-    const password = document.getElementById("pass").value || "";
+    const password = passInput ? passInput.value : "";
     if (!username || !password)
     {
       errorEl.textContent = "Ingrese usuario y contraseña.";
