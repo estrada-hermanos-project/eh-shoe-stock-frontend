@@ -124,7 +124,7 @@ function openCreateOrder(ctx, suppliers)
       <select id="f-sup">${optionsHtml(suppliers, (s) => s.id, (s) => s.name)}</select></div>
     <p class="muted">El pedido nace como PENDIENTE. Luego agregue las líneas.</p>`,
     `<button class="btn btn--ghost" data-close type="button">Cancelar</button>
-     <button class="btn btn--primary" id="f-save" type="button">Crear pedido</button>`);
+     <button class="btn btn--primary" id="f-save" type="button">Abrir Pedido</button>`);
   $("#f-save").addEventListener("click", async () =>
   {
     const id = $("#f-id").value.trim();
@@ -177,7 +177,7 @@ async function showOrder(root, ctx, orderId)
             <div class="field" style="flex:1"><label>Variante</label>
               <select id="d-var">${optionsHtml(variants || [], (v) => v.shoe_stock_id,
                 (v) => `${v.shoe_name} · ${v.color} · talla ${v.size} (#${v.shoe_stock_id})`)}</select></div>
-            <div class="field"><label>Pares</label><input type="number" id="d-amt" min="1" value="6"></div>
+            <div class="field"><label>Pares</label><input type="number" id="d-amt" min="1" value="1"></div>
             <button class="btn btn--primary btn--sm" id="d-add">Agregar línea</button>
           </div>
           <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap">
@@ -188,11 +188,17 @@ async function showOrder(root, ctx, orderId)
 
     $("#d-add", panel)?.addEventListener("click", async () =>
     {
+      const amount = Number($("#d-amt", panel).value);
+      if (!Number.isFinite(amount) || amount < 1)
+      {
+        toast("Indique al menos 1 par.");
+        return;
+      }
       try
       {
         await OrdersApi.addDetail(order.order_id, {
           shoe_stock_id: Number($("#d-var", panel).value),
-          amount: Number($("#d-amt", panel).value),
+          amount: amount,
         });
         toast("Línea agregada");
         showOrder(root, ctx, order.order_id);
