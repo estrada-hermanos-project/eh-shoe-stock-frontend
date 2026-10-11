@@ -1,11 +1,25 @@
 import { InventoryApi, ReportsApi, ShoesApi } from "../api.js";
 import {
-  I, $, badgeStock, bannerError, empty, escapeHtml, formatInt, kpi, skeleton,
+  I, $, badgeStock, bannerError, empty, escapeHtml, formatInt, kpi, optionsHtml, skeleton,
   tableWrap, toast,
 } from "../ui.js";
 import { openStockModal } from "./ventas.js";
 
 const CHIPS = ["Todos", "Dama", "Caballero", "Niño", "Niña", "Bajo", "Agotado", "Sin rotación"];
+
+function codeSelect(shoes)
+{
+  const catalog = shoes || [];
+  if (!catalog.length)
+  {
+    return `<select id="q-code" disabled><option value="">No hay estilos</option></select>`;
+  }
+  return `<select id="q-code">${optionsHtml(
+    catalog,
+    (shoe) => shoe.code,
+    (shoe) => `${shoe.code} · ${shoe.name}`
+  )}</select>`;
+}
 
 export async function renderInventario(root, ctx)
 {
@@ -58,7 +72,8 @@ export async function renderInventario(root, ctx)
         <div class="card__head"><div class="card__title">Consulta puntual</div><div class="card__sub">Cuando tiene el zapato en la mano</div></div>
         <div class="card__body">
           <div class="filters" style="margin:0">
-            <div class="field"><label>Código</label><input id="q-code" placeholder="EH-CAB-001"></div>
+            <div class="field"><label>Código</label>
+              ${codeSelect(shoes)}</div>
             <div class="field"><label>Color</label><input id="q-color" placeholder="Negro"></div>
             <div class="field"><label>Talla</label><input type="number" id="q-size" min="1" placeholder="40"></div>
             <button class="btn btn--primary btn--sm" id="q-go">Consultar</button>
