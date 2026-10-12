@@ -7,20 +7,23 @@ import { openStockModal } from "./ventas.js";
 
 const CHIPS = ["Todos", "Dama", "Caballero", "Niño", "Niña", "Bajo", "Agotado", "Sin rotación"];
 
-function renderPointQuery(data)
+function renderPointQuery(data, filtered)
 {
   if (Array.isArray(data))
   {
-    return renderStyleVariants(data);
+    return renderStyleVariants(data, filtered);
   }
   return `<div class="lookup-result"><small>${escapeHtml(data.name)} · ${escapeHtml(data.color)} · talla ${data.size}</small>${formatInt(data.stock)} pares</div>`;
 }
 
-function renderStyleVariants(rows)
+function renderStyleVariants(rows, filtered)
 {
   if (!rows.length)
   {
-    return empty(I.inventario, "Ese estilo no tiene existencias.");
+    const message = filtered
+      ? "No hay existencias para ese color o talla."
+      : "Ese estilo no tiene existencias.";
+    return empty(I.inventario, message);
   }
   const title = rows[0].name ? `<p class="muted">${escapeHtml(rows[0].name)}</p>` : "";
   return title + tableWrap(
@@ -31,6 +34,52 @@ function renderStyleVariants(rows)
       <td class="num">${formatInt(row.stock)}</td>
     </tr>`).join("")
   );
+}
+
+function distinct(values)
+{
+  const seen = new Set();
+  const result = [];
+  values.forEach((value) =>
+  {
+    const key = String(value);
+    if (!seen.has(key))
+    {
+      seen.add(key);
+      result.push(value);
+    }
+  });
+  return result;
+}
+
+function asVariants(data)
+{
+  if (Array.isArray(data))
+  {
+    return data;
+  }
+  return data ? [data] : [];
+}
+
+function sizesFor(variants, color)
+{
+  const source = color ? variants.filter((row) => row.color === color) : variants;
+  return distinct(source.map((row) => row.size).filter((size) => size !== undefined && size !== null))
+    .sort((left, right) => Number(left) - Number(right));
+}
+
+function paintSizes(sizeSelect, variants, color)
+{
+  const sizes = sizesFor(variants, color);
+  const previous = sizeSelect.value;
+  sizeSelect.disabled = sizes.length === 0;
+  sizeSelect.innerHTML = sizes.length
+    ? `<option value="">Cualquiera</option>${optionsHtml(sizes, (size) => size, (size) => size, previous)}`
+    : `<option value="">Sin tallas</option>`;
+  if (previous && !sizes.some((size) => String(size) === previous))
+  {
+    sizeSelect.value = "";
+  }
 }
 
 function codeSelect(shoes)
@@ -100,8 +149,8 @@ export async function renderInventario(root, ctx)
           <div class="filters" style="margin:0">
             <div class="field"><label>Código</label>
               ${codeSelect(shoes)}</div>
-            <div class="field"><label>Color</label><input id="q-color" placeholder="Negro"></div>
-            <div class="field"><label>Talla</label><input type="number" id="q-size" min="1" placeholder="40"></div>
+            <div class="field"><label>Color</label><select id="q-color" disabled><option value="">Cualquiera</option></select></div>
+            <div class="field"><label>Talla</label><select id="q-size" disabled><option value="">Cualquiera</option></select></div>
             <button class="btn btn--primary btn--sm" id="q-go">Consultar</button>
           </div>
           <div id="q-result"></div>
@@ -130,6 +179,44 @@ export async function renderInventario(root, ctx)
         ) : empty(I.inventario, "Sin resultados para el filtro seleccionado.")}</div>
       </div>`;
 
+    let styleVariants = [];
+
+    async function refreshStyleFilters()
+    {
+      const shoeId = $("#q-code", root).value.trim();
+      const colorSelect = $("#q-color", root);
+      const sizeSelect = $("#q-size", root);
+      if (!shoeId)
+      {
+        styleVariants = [];
+        colorSelect.disabled = true;
+        sizeSelect.disabled = true;
+        colorSelect.innerHTML = `<option value="">Sin colores</option>`;
+        sizeSelect.innerHTML = `<option value="">Sin tallas</option>`;
+        return;
+      }
+      try
+      {
+        styleVariants = asVariants(await InventoryApi.query(shoeId));
+        const colors = distinct(styleVariants.map((row) => row.color).filter(Boolean));
+        colorSelect.disabled = colors.length === 0;
+        colorSelect.innerHTML = colors.length
+          ? `<option value="">Cualquiera</option>${optionsHtml(colors, (color) => color, (color) => color)}`
+          : `<option value="">Sin colores</option>`;
+        paintSizes(sizeSelect, styleVariants, "");
+      }
+      catch (err)
+      {
+        styleVariants = [];
+        $("#q-result", root).innerHTML = `<p class="muted">${escapeHtml(err.message)}</p>`;
+      }
+    }
+
+    $("#q-code", root)?.addEventListener("change", () => refreshStyleFilters());
+    $("#q-color", root)?.addEventListener("change", () =>
+    {
+      paintSizes($("#q-size", root), styleVariants, $("#q-color", root).value);
+    });
     $("#q-go", root)?.addEventListener("click", async () =>
     {
       const shoeId = $("#q-code", root).value.trim();
@@ -144,13 +231,14 @@ export async function renderInventario(root, ctx)
       try
       {
         const data = await InventoryApi.query(shoeId, color, sizeText === "" ? undefined : Number(sizeText));
-        box.innerHTML = renderPointQuery(data);
+        box.innerHTML = renderPointQuery(data, Boolean(color || sizeText));
       }
       catch (err)
       {
         box.innerHTML = `<p class="muted">${escapeHtml(err.message)}</p>`;
       }
     });
+    await refreshStyleFilters();
     $("[data-action='ingresar-pares']", root)?.addEventListener("click", () => openStockModal(ctx));
   }
   catch (err)
