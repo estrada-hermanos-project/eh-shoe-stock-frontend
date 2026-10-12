@@ -7,6 +7,32 @@ import { openStockModal } from "./ventas.js";
 
 const CHIPS = ["Todos", "Dama", "Caballero", "Niño", "Niña", "Bajo", "Agotado", "Sin rotación"];
 
+function renderPointQuery(data)
+{
+  if (Array.isArray(data))
+  {
+    return renderStyleVariants(data);
+  }
+  return `<div class="lookup-result"><small>${escapeHtml(data.name)} · ${escapeHtml(data.color)} · talla ${data.size}</small>${formatInt(data.stock)} pares</div>`;
+}
+
+function renderStyleVariants(rows)
+{
+  if (!rows.length)
+  {
+    return empty(I.inventario, "Ese estilo no tiene existencias.");
+  }
+  const title = rows[0].name ? `<p class="muted">${escapeHtml(rows[0].name)}</p>` : "";
+  return title + tableWrap(
+    [{ label: "Color" }, { label: "Talla" }, { label: "Pares", num: true }],
+    rows.map((row) => `<tr>
+      <td>${escapeHtml(row.color)}</td>
+      <td>${row.size}</td>
+      <td class="num">${formatInt(row.stock)}</td>
+    </tr>`).join("")
+  );
+}
+
 function codeSelect(shoes)
 {
   const catalog = shoes || [];
@@ -108,17 +134,17 @@ export async function renderInventario(root, ctx)
     {
       const shoeId = $("#q-code", root).value.trim();
       const color = $("#q-color", root).value.trim();
-      const size = Number($("#q-size", root).value);
+      const sizeText = $("#q-size", root).value.trim();
       const box = $("#q-result", root);
-      if (!shoeId || !color || !size)
+      if (!shoeId)
       {
-        toast("Indique código, color y talla.");
+        toast("Indique el código del estilo.");
         return;
       }
       try
       {
-        const row = await InventoryApi.query(shoeId, color, size);
-        box.innerHTML = `<div class="lookup-result"><small>${escapeHtml(row.name)} · ${escapeHtml(row.color)} · talla ${row.size}</small>${formatInt(row.stock)} pares</div>`;
+        const data = await InventoryApi.query(shoeId, color, sizeText === "" ? undefined : Number(sizeText));
+        box.innerHTML = renderPointQuery(data);
       }
       catch (err)
       {

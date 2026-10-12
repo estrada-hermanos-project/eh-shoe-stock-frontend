@@ -8,6 +8,7 @@ const MESSAGES = {
   "Insufficient stock to decrease": "No hay pares suficientes para completar la venta",
   "Stock not found for the given shoe, color and size":
     "No se encontró existencias para ese código, color y talla",
+  "Color and size must be sent together": "Para afinar la consulta, indique color y talla",
   "Shoe not found": "No se encontró el estilo",
   "Supplier not found": "No se encontró el proveedor",
   "Order not found": "No se encontró el pedido",
