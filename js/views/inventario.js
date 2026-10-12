@@ -89,7 +89,7 @@ function codeSelect(shoes)
   {
     return `<select id="q-code" disabled><option value="">No hay estilos</option></select>`;
   }
-  return `<select id="q-code">${optionsHtml(
+  return `<select id="q-code"><option value="">Seleccione un código</option>${optionsHtml(
     catalog,
     (shoe) => shoe.code,
     (shoe) => `${shoe.code} · ${shoe.name}`
@@ -151,12 +151,13 @@ export async function renderInventario(root, ctx)
               ${codeSelect(shoes)}</div>
             <div class="field"><label>Color</label><select id="q-color" disabled><option value="">Cualquiera</option></select></div>
             <div class="field"><label>Talla</label><select id="q-size" disabled><option value="">Cualquiera</option></select></div>
-            <button class="btn btn--primary btn--sm" id="q-go">Consultar</button>
+            <button class="btn btn--primary btn--sm" id="q-go" type="button">Consultar</button>
+            <button class="btn btn--ghost btn--sm" id="q-clear" type="button">Limpiar consulta</button>
           </div>
           <div id="q-result"></div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" id="inventory-general">
         <div class="card__head">
           <div><div class="card__title">Estado del inventario</div><div class="card__sub">Existencias por estilo, color y talla</div></div>
           <button class="btn btn--gold btn--sm" data-action="ingresar-pares">${I.plus} Ingresar pares</button>
@@ -238,6 +239,35 @@ export async function renderInventario(root, ctx)
         box.innerHTML = `<p class="muted">${escapeHtml(err.message)}</p>`;
       }
     });
+    function clearPointQuery()
+    {
+      const code = $("#q-code", root);
+      const color = $("#q-color", root);
+      const size = $("#q-size", root);
+      styleVariants = [];
+      if (code && !code.disabled)
+      {
+        code.value = "";
+      }
+      if (color)
+      {
+        color.disabled = true;
+        color.innerHTML = `<option value="">Sin colores</option>`;
+      }
+      if (size)
+      {
+        size.disabled = true;
+        size.innerHTML = `<option value="">Sin tallas</option>`;
+      }
+      const box = $("#q-result", root);
+      if (box)
+      {
+        box.innerHTML = "";
+      }
+      $("#inventory-general", root)?.scrollIntoView({ block: "nearest" });
+    }
+
+    $("#q-clear", root)?.addEventListener("click", clearPointQuery);
     await refreshStyleFilters();
     $("[data-action='ingresar-pares']", root)?.addEventListener("click", () => openStockModal(ctx));
   }
