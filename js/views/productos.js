@@ -51,7 +51,7 @@ export async function renderProductos(root, ctx)
           </div>
           <div class="prod__body">
             <div class="prod__cat">${escapeHtml(s.type)} · ${escapeHtml(s.supplier_name || "")}</div>
-            <h4 class="prod__name">${escapeHtml(s.name)}</h4>
+            <h4 class="prod__name">${escapeHtml(s.name)} <span class="prod__style-code">Código ${escapeHtml(s.code)}</span></h4>
             <p class="muted">${escapeHtml(s.description || "Sin descripción")}</p>
             <div class="prod__foot">
               <span>Stock: <b>${stockByName[s.name] ?? "—"}</b></span>
@@ -139,7 +139,7 @@ async function openShoeDetail(ctx, code, stockByName)
         <img src="${placeholderForType(shoe.type)}" alt="" style="width:150px;height:150px;object-fit:cover;border-radius:12px;border:1px solid var(--line)">
         <div style="flex:1;min-width:180px">
           <div class="prod__cat">${escapeHtml(shoe.type)} · ${escapeHtml(shoe.supplier_name || "")}</div>
-          <p class="muted" style="margin:.3rem 0 .6rem"><span class="code">${escapeHtml(shoe.code)}</span></p>
+          <p class="muted" style="margin:.3rem 0 .6rem">Código del estilo <span class="code">${escapeHtml(shoe.code)}</span></p>
           <p>${escapeHtml(shoe.description || "Sin descripción")}</p>
           <p class="muted">Foto de referencia · el catálogo aún no guarda fotografías</p>
           <div><div class="muted">Stock aproximado</div><b style="font-size:1.3rem">${stockByName[shoe.name] ?? "—"} pares</b></div>
