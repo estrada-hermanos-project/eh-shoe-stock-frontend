@@ -129,6 +129,7 @@ export const SalesApi = {
 
 export const InventoryApi = {
   query: (shoeId, color, size) => get("/inventory", { shoe_id: shoeId, color, size }),
+  bySupplier: (supplierId) => get(`/inventory/supplier/${supplierId}`),
   register: (body) => post("/inventory", body),
 };
 
