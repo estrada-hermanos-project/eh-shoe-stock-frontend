@@ -123,8 +123,8 @@ export const AuthApi = {
 
 export const SalesApi = {
   register: (body) => post("/sales", body),
-  byDate: (date) => get("/sales/by-date", { date }),
-  range: (startDate, endDate) => get("/sales", { start_date: startDate, end_date: endDate }),
+  byDate: (date, shoeCode) => get("/sales/by-date", cleanParams({ date, shoe_code: shoeCode })),
+  range: (startDate, endDate, shoeCode) => get("/sales", cleanParams({ start_date: startDate, end_date: endDate, shoe_code: shoeCode })),
 };
 
 export const InventoryApi = {

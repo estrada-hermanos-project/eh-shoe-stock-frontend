@@ -129,10 +129,10 @@ function salesTable(list)
     return empty(I.ventas, "Aún no hay ventas hoy.", `<button class="btn btn--gold btn--sm" data-action="nueva-venta">${I.plus} Registrar venta</button>`);
   }
   return tableWrap(
-    [{ label: "#" }, { label: "Fecha" }, { label: "Estilo" }, { label: "Color" }, { label: "Talla" }, { label: "Pares", num: true }],
+    [{ label: "#" }, { label: "Código" }, { label: "Fecha" }, { label: "Estilo" }, { label: "Color" }, { label: "Talla" }, { label: "Pares", num: true }],
     list.map((s, i) => `<tr>
-      <td class="code">${i + 1}</td><td>${escapeHtml(s.sale_date)}</td>
-      <td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.color)}</td>
+      <td class="code">${i + 1}</td><td class="code">${escapeHtml(s.shoe_code || "")}</td>
+      <td>${escapeHtml(s.sale_date)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.color)}</td>
       <td>${s.size}</td><td class="num">${s.stock}</td>
     </tr>`).join("")
   );

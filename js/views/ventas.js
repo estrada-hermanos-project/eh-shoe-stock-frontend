@@ -10,6 +10,7 @@ export async function renderVentas(root, ctx)
   const date = ctx.params.get("date") || todayIso();
   const start = ctx.params.get("start") || todayIso();
   const end = ctx.params.get("end") || todayIso();
+  const code = ctx.params.get("code") || "";
   const query = (ctx.query || "").toLowerCase();
 
   root.innerHTML = `
@@ -31,11 +32,12 @@ export async function renderVentas(root, ctx)
 
   try
   {
-    const list = mode === "rango"
-      ? await SalesApi.range(start, end)
-      : await SalesApi.byDate(date);
+    const [list, shoes] = await Promise.all([
+      mode === "rango" ? SalesApi.range(start, end, code) : SalesApi.byDate(date, code),
+      ShoesApi.list(),
+    ]);
     const filtered = (list || []).filter((s) =>
-      !query || `${s.name} ${s.color}`.toLowerCase().includes(query));
+      !query || `${s.shoe_code} ${s.name} ${s.color}`.toLowerCase().includes(query));
     const pairs = filtered.reduce((a, s) => a + Number(s.stock || 0), 0);
 
     root.innerHTML = `
@@ -60,15 +62,18 @@ export async function renderVentas(root, ctx)
               <input type="date" id="v-start" value="${start}"></div>
             <div class="field" id="f-end"${mode === "dia" ? " hidden" : ""}><label>Hasta</label>
               <input type="date" id="v-end" value="${end}"></div>
+            <div class="field"><label>Código del zapato</label>${codeSelect(shoes || [], code)}</div>
             <button class="btn btn--primary btn--sm" id="v-apply">Consultar</button>
           </div>
         </div>
         <div class="card__body card__body--flush">${filtered.length ? tableWrap(
-          [{ label: "#" }, { label: "Fecha" }, { label: "Estilo" }, { label: "Color" }, { label: "Talla" }, { label: "Pares", num: true }],
-          filtered.map((s, i) => `<tr><td class="code">${i + 1}</td><td>${escapeHtml(s.sale_date)}</td>
-            <td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.color)}</td><td>${s.size}</td>
-            <td class="num">${s.stock}</td></tr>`).join("")
-        ) : empty(I.ventas, "No hay ventas que coincidan.")}</div>
+          [{ label: "#" }, { label: "Código" }, { label: "Fecha" }, { label: "Estilo" }, { label: "Color" }, { label: "Talla" }, { label: "Pares", num: true }],
+          filtered.map((s, i) => `<tr><td class="code">${i + 1}</td><td class="code">${escapeHtml(s.shoe_code || "")}</td>
+            <td>${escapeHtml(s.sale_date)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.color)}</td>
+            <td>${s.size}</td><td class="num">${s.stock}</td></tr>`).join("")
+        ) : empty(I.ventas, code && !(list || []).length
+          ? "Ese estilo no tiene ventas en el período."
+          : "No hay ventas que coincidan.")}</div>
       </div>`;
 
     bindFilters(root, ctx);
@@ -97,10 +102,25 @@ function bindFilters(root, ctx)
   $("#v-apply", root)?.addEventListener("click", () =>
   {
     const nextMode = $("#v-mode", root).value;
+    const code = $("#v-code", root)?.value || "";
     ctx.go("ventas", nextMode === "rango"
-      ? { mode: "rango", start: $("#v-start", root).value, end: $("#v-end", root).value }
-      : { mode: "dia", date: $("#v-date", root).value });
+      ? { mode: "rango", start: $("#v-start", root).value, end: $("#v-end", root).value, code }
+      : { mode: "dia", date: $("#v-date", root).value, code });
   });
+}
+
+function codeSelect(shoes, selected)
+{
+  if (!shoes.length)
+  {
+    return `<select id="v-code" disabled><option value="">No hay estilos</option></select>`;
+  }
+  return `<select id="v-code"><option value="">Todos</option>${optionsHtml(
+    shoes,
+    (shoe) => shoe.code,
+    (shoe) => `${shoe.code} · ${shoe.name}`,
+    selected
+  )}</select>`;
 }
 
 export async function openSaleModal(ctx)
