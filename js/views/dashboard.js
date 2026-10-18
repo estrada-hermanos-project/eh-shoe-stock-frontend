@@ -54,6 +54,11 @@ export async function renderDashboard(root, ctx)
     const damaPct = dama?.share_percent ?? (damaPairs + cabPairs ? Math.round((damaPairs / (damaPairs + cabPairs)) * 100) : 0);
 
     root.innerHTML = `
+      <div class="period-switch" style="margin-bottom:1rem">
+        ${["hoy", "semana", "mes"].map((p) =>
+          `<button class="chip ${period === p ? "is-active" : ""}" data-go="dashboard" data-period="${p}">${p === "hoy" ? "Hoy" : p === "semana" ? "Esta semana" : "Este mes"}</button>`
+        ).join("")}
+      </div>
       <div class="kpis">
         ${kpi(I.ventas, "Pares vendidos", formatInt(salesData.amount_sold))}
         ${kpi(I.inventario, "Stock total (pares)", formatInt(inv.pairs_in_stock))}
@@ -64,7 +69,7 @@ export async function renderDashboard(root, ctx)
         <div class="card">
           <div class="card__head"><div class="card__title">Productos más vendidos</div><span class="badge badge--gold">Pares</span></div>
           <div class="card__body">${rankBars((top || []).map((p) => ({
-            label: `${p.shoe_name} · ${p.color} · ${p.size}`,
+            label: `${[p.shoe_code, p.shoe_name].filter(Boolean).join(" · ")} · ${p.color} · ${p.size}`,
             v: p.amount_sold,
           })))}</div>
         </div>
@@ -85,9 +90,7 @@ export async function renderDashboard(root, ctx)
           <div class="card__body">${alerts.length ? alerts.slice(0, 8).map((p) => `
             <div style="display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;border-bottom:1px solid var(--line-soft)">
               <div><b>${escapeHtml(p.shoe_name)}</b><div class="muted">${escapeHtml(p.color)} · talla ${p.size}</div></div>
-              <div style="text-align:right">${p.stock === 0 || p.stock == null
-                ? `<span class="badge badge--danger">Agotado</span>`
-                : `<span class="badge badge--warn">${p.stock} pares</span>`}</div>
+              <div style="text-align:right">${alertMark(p.stock)}</div>
             </div>`).join("") : empty(I.check, "Sin alertas de stock.")}</div>
         </div>
         <div class="card">
@@ -120,6 +123,16 @@ export async function renderDashboard(root, ctx)
     root.innerHTML = bannerError(err.message);
     $("[data-retry]", root)?.addEventListener("click", () => ctx.reload());
   }
+}
+
+function alertMark(stock)
+{
+  const pairs = stock == null ? 0 : Number(stock);
+  if (pairs === 0)
+  {
+    return `<span class="badge badge--danger">Agotado</span><div class="muted">0 pares</div>`;
+  }
+  return `<span class="badge badge--warn">Bajo</span><div class="muted">${pairs} pares</div>`;
 }
 
 function salesTable(list)
