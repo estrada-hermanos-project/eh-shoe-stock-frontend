@@ -1,4 +1,4 @@
-import { OrdersApi, ReportsApi, SuppliersApi } from "../api.js";
+import { InventoryApi, OrdersApi, ShoesApi, SuppliersApi } from "../api.js";
 import {
   I, $, badgeStatus, bannerError, closeModal, empty, escapeHtml, formatInt, kpi,
   monthStartIso, openModal, optionsHtml, pairsOf, skeleton, tableWrap, todayIso, toast,
@@ -69,11 +69,14 @@ export async function renderMercaderia(root, ctx)
           <button class="btn btn--gold btn--sm" id="m-new">${I.plus} Nuevo pedido</button>
         </div>
         <div class="card__body card__body--flush">${list.length ? tableWrap(
-          [{ label: "Folio" }, { label: "Proveedor" }, { label: "Fecha" }, { label: "Estado" }, { label: "Pares", num: true }, { label: "" }],
+          tab === "RECIBIDA"
+            ? [{ label: "Folio" }, { label: "Proveedor" }, { label: "Fecha" }, { label: "Recibido" }, { label: "Estado" }, { label: "Pares", num: true }, { label: "" }]
+            : [{ label: "Folio" }, { label: "Proveedor" }, { label: "Fecha" }, { label: "Estado" }, { label: "Pares", num: true }, { label: "" }],
           list.map((o) => `<tr>
             <td class="code">${escapeHtml(o.order_id)}</td>
             <td>${escapeHtml(o.supplier_name)}</td>
             <td>${escapeHtml(o.creation_date)}</td>
+            ${tab === "RECIBIDA" ? `<td>${escapeHtml(o.received_date || "")}</td>` : ""}
             <td>${badgeStatus(o.status)}</td>
             <td class="num">${pairsOf(o)}</td>
             <td><button class="btn btn--ghost btn--sm" data-open="${escapeHtml(o.order_id)}">Abrir</button></td>
@@ -156,27 +159,29 @@ async function showOrder(root, ctx, orderId)
   try
   {
     const order = await OrdersApi.byId(orderId);
-    const variants = await ReportsApi.inventory({ include_out_of_stock: true });
     const pending = order.status === "PENDIENTE";
+    const catalog = pending ? await supplierCatalog(order.supplier_id) : { shoes: [], variants: [] };
+    const received = order.status === "RECIBIDA" && order.received_date
+      ? ` · Recibido el ${escapeHtml(order.received_date)}`
+      : "";
     panel.innerHTML = `
       <div class="card" style="margin-top:1.1rem">
         <div class="card__head">
           <div>
             <div class="card__title">Pedido ${escapeHtml(order.order_id)}</div>
-            <div class="card__sub">${escapeHtml(order.supplier_name)} · ${escapeHtml(order.creation_date)}</div>
+            <div class="card__sub">${escapeHtml(order.supplier_name)} · ${escapeHtml(order.creation_date)}${received}</div>
           </div>
           ${badgeStatus(order.status)}
         </div>
         <div class="card__body card__body--flush">${(order.details || []).length ? tableWrap(
-          [{ label: "Variante" }, { label: "Estilo" }, { label: "Pares", num: true }],
-          order.details.map((d) => `<tr><td class="code">${d.shoe_stock_id}</td>
+          [{ label: "Código" }, { label: "Estilo" }, { label: "Pares", num: true }],
+          order.details.map((d) => `<tr><td class="code">${escapeHtml(d.shoe_code || "")}</td>
             <td>${escapeHtml(d.shoe_name)}</td><td class="num">${d.amount}</td></tr>`).join("")
         ) : empty(I.box, "Este pedido aún no tiene líneas.")}</div>
         ${pending ? `<div class="card__body">
           <div class="filters" style="margin:0">
             <div class="field" style="flex:1"><label>Variante</label>
-              <select id="d-var">${optionsHtml(variants || [], (v) => v.shoe_stock_id,
-                (v) => `${v.shoe_name} · ${v.color} · talla ${v.size} (#${v.shoe_stock_id})`)}</select></div>
+              ${variantSelect(catalog.shoes, catalog.variants)}</div>
             <div class="field"><label>Pares</label><input type="number" id="d-amt" min="1" value="1"></div>
             <button class="btn btn--primary btn--sm" id="d-add">Agregar línea</button>
           </div>
@@ -188,7 +193,13 @@ async function showOrder(root, ctx, orderId)
 
     $("#d-add", panel)?.addEventListener("click", async () =>
     {
+      const variantId = Number($("#d-var", panel).value);
       const amount = Number($("#d-amt", panel).value);
+      if (!variantId)
+      {
+        toast("Ese zapatero no tiene estilos registrados.");
+        return;
+      }
       if (!Number.isFinite(amount) || amount < 1)
       {
         toast("Indique al menos 1 par.");
@@ -197,7 +208,7 @@ async function showOrder(root, ctx, orderId)
       try
       {
         await OrdersApi.addDetail(order.order_id, {
-          shoe_stock_id: Number($("#d-var", panel).value),
+          shoe_stock_id: variantId,
           amount: amount,
         });
         toast("Línea agregada");
@@ -214,6 +225,33 @@ async function showOrder(root, ctx, orderId)
   {
     panel.innerHTML = bannerError(err.message);
   }
+}
+
+async function supplierCatalog(supplierId)
+{
+  if (!supplierId)
+  {
+    return { shoes: [], variants: [] };
+  }
+  const [shoes, variants] = await Promise.all([
+    ShoesApi.bySupplier(supplierId),
+    InventoryApi.bySupplier(supplierId),
+  ]);
+  return { shoes: shoes || [], variants: variants || [] };
+}
+
+function variantSelect(shoes, variants)
+{
+  if (!shoes.length)
+  {
+    return `<select id="d-var" disabled><option value="">Ese zapatero no tiene estilos registrados</option></select>`;
+  }
+  if (!variants.length)
+  {
+    return `<select id="d-var" disabled><option value="">Ese zapatero no tiene variantes para pedir</option></select>`;
+  }
+  return `<select id="d-var">${optionsHtml(variants, (variant) => variant.shoe_stock_id,
+    (variant) => `${variant.shoe_code} · ${variant.shoe_name} · ${variant.color} · talla ${variant.size}`)}</select>`;
 }
 
 function confirmReceive(ctx, order)
