@@ -1,9 +1,8 @@
-import { ReportsApi, ShoesApi, SuppliersApi } from "../api.js";
+import { InventoryApi, ReportsApi, ShoesApi, SuppliersApi } from "../api.js";
 import {
   I, $, badgeStock, bannerError, closeModal, empty, escapeHtml, openModal,
   optionsHtml, placeholderForType, toast,
 } from "../ui.js";
-import { openStockModal } from "./ventas.js";
 
 const TYPES = ["Todos", "Dama", "Caballero", "Niño", "Niña"];
 
@@ -151,7 +150,7 @@ async function openShoeDetail(ctx, code, stockByName)
     $("#f-var").addEventListener("click", () =>
     {
       closeModal();
-      openStockModal(ctx, shoe.code);
+      openVariantModal(ctx, shoe);
     });
     $("#f-del").addEventListener("click", () => confirmDeleteShoe(ctx, shoe));
   }
@@ -159,6 +158,41 @@ async function openShoeDetail(ctx, code, stockByName)
   {
     toast(err.message, "err");
   }
+}
+
+function openVariantModal(ctx, shoe)
+{
+  openModal("Agregar talla/color", `
+    <div class="field"><label>Estilo</label>
+      <input id="f-code" value="${escapeHtml(shoe.code)} · ${escapeHtml(shoe.name)}" disabled></div>
+    <div class="form-row">
+      <div class="field"><label>Color</label><input id="f-color" placeholder="Ej. Negro" required></div>
+      <div class="field"><label>Talla</label><input type="number" id="f-size" min="1" value="36"></div>
+    </div>
+    <p class="muted">La variante queda en 0 pares. El stock solo sube cuando se recibe un pedido.</p>`,
+    `<button class="btn btn--ghost" data-close type="button">Cancelar</button>
+     <button class="btn btn--primary" id="f-save" type="button">Agregar variante</button>`);
+  $("#f-save").addEventListener("click", async () =>
+  {
+    const color = $("#f-color").value.trim();
+    const size = Number($("#f-size").value);
+    if (!color || size < 1)
+    {
+      toast("Indique color y talla.");
+      return;
+    }
+    try
+    {
+      await InventoryApi.createVariant({ id_shoe: shoe.code, color, size });
+      closeModal();
+      toast(`Variante registrada: ${shoe.name} color ${color} talla ${size}, con 0 pares`);
+      ctx.reload();
+    }
+    catch (err)
+    {
+      toast(err.message, "err");
+    }
+  });
 }
 
 function confirmDeleteShoe(ctx, shoe)

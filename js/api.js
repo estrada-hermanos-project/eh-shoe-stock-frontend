@@ -17,6 +17,9 @@ const MESSAGES = {
   "Order has no details to receive": "El pedido no tiene líneas para recibir",
   "An order with this id already exists": "Ya existe un pedido con ese folio",
   "A shoe with this code already exists": "Ya existe un estilo con ese código",
+  "A variant with this color and size already exists": "Esa talla y color ya existen en el estilo",
+  "Color is required": "El color es obligatorio",
+  "Size must be a positive integer": "La talla debe ser un número positivo",
   "A supplier with this phone already exists": "Ya existe un proveedor con ese teléfono",
   "A user with this DPI already exists": "Ya existe un administrador con ese DPI",
   "An account with this username already exists": "Ese usuario de acceso ya existe",
@@ -131,6 +134,7 @@ export const InventoryApi = {
   query: (shoeId, color, size) => get("/inventory", { shoe_id: shoeId, color, size }),
   bySupplier: (supplierId) => get(`/inventory/supplier/${supplierId}`),
   register: (body) => post("/inventory", body),
+  createVariant: (body) => post("/inventory/variants", body),
 };
 
 export const ShoesApi = {
