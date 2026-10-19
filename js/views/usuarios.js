@@ -10,7 +10,7 @@ export async function renderUsuarios(root, ctx)
   try
   {
     const list = (await UsersApi.list() || []).filter((u) =>
-      !query || `${u.name} ${u.phone} ${u.email || ""}`.toLowerCase().includes(query));
+      !query || `${u.dpi || ""} ${u.name} ${u.phone} ${u.email || ""}`.toLowerCase().includes(query));
     root.innerHTML = `
       <div class="section-title">
         <div><div class="eyebrow">Cuenta</div><h3>Administradores</h3></div>
@@ -18,7 +18,7 @@ export async function renderUsuarios(root, ctx)
       </div>
       <div class="card" style="margin-bottom:1.1rem">
         <div class="card__head"><div class="card__title">Personas</div>
-          <div class="card__sub">El listado no incluye DPI; búsquelo para editar o eliminar</div></div>
+          <div class="card__sub">Cada fila muestra el DPI y permite editar o eliminar</div></div>
         <div class="card__body">
           <div class="filters" style="margin:0">
             <div class="field"><label>DPI (13 dígitos)</label><input id="u-dpi" inputmode="numeric" maxlength="13" placeholder="13 dígitos"></div>
@@ -27,9 +27,17 @@ export async function renderUsuarios(root, ctx)
           <div id="u-found"></div>
         </div>
         <div class="card__body card__body--flush">${list.length ? tableWrap(
-          [{ label: "Nombre" }, { label: "Teléfono" }, { label: "Correo" }],
-          list.map((u) => `<tr><td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.phone)}</td>
-            <td>${escapeHtml(u.email || "—")}</td></tr>`).join("")
+          [{ label: "DPI" }, { label: "Nombre" }, { label: "Teléfono" }, { label: "Correo" }, { label: "" }],
+          list.map((u) => `<tr>
+            <td>${escapeHtml(u.dpi || "—")}</td>
+            <td>${escapeHtml(u.name)}</td>
+            <td>${escapeHtml(u.phone)}</td>
+            <td>${escapeHtml(u.email || "—")}</td>
+            <td class="table-actions">
+              <button class="btn btn--ghost btn--sm btn--icon" type="button" data-edit="${escapeHtml(u.dpi || "")}" aria-label="Editar" title="Editar">${I.pencil}</button>
+              <button class="btn btn--ghost btn--sm btn--icon" type="button" data-del="${escapeHtml(u.dpi || "")}" aria-label="Eliminar" title="Eliminar">${I.trash}</button>
+            </td>
+          </tr>`).join("")
         ) : empty(I.usuarios, "No hay administradores.")}</div>
       </div>
       <div class="card">
@@ -46,6 +54,32 @@ export async function renderUsuarios(root, ctx)
       </div>`;
 
     $("#u-new", root)?.addEventListener("click", () => openAdminForm(ctx));
+    root.querySelectorAll("[data-edit]").forEach((btn) =>
+    {
+      btn.addEventListener("click", () =>
+      {
+        const user = list.find((item) => item.dpi === btn.dataset.edit);
+        if (!user)
+        {
+          toast("El listado no incluye el DPI de este administrador.", "err");
+          return;
+        }
+        openAdminForm(ctx, user.dpi, user);
+      });
+    });
+    root.querySelectorAll("[data-del]").forEach((btn) =>
+    {
+      btn.addEventListener("click", () =>
+      {
+        const user = list.find((item) => item.dpi === btn.dataset.del);
+        if (!user)
+        {
+          toast("El listado no incluye el DPI de este administrador.", "err");
+          return;
+        }
+        confirmDelete(ctx, user.dpi, user);
+      });
+    });
     $("#u-find", root)?.addEventListener("click", async () =>
     {
       const dpi = $("#u-dpi", root).value.trim();
