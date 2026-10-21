@@ -5,7 +5,7 @@ FROM nginx:1.27-alpine
 
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
-COPY index.html acceso.html app.html /usr/share/nginx/html/
+COPY index.html acceso.html app.html codigo.html recuperacion.html nueva-contrasena.html /usr/share/nginx/html/
 COPY css/ /usr/share/nginx/html/css/
 COPY js/ /usr/share/nginx/html/js/
 COPY images/ /usr/share/nginx/html/images/
