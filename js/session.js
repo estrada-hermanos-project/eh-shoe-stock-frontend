@@ -1,4 +1,5 @@
 const KEY = "eh.session";
+const CHALLENGE_KEY = "eh.loginChallenge";
 
 export function saveSession({ token, username })
 {
@@ -12,6 +13,43 @@ export function saveSession({ token, username })
 export function clearSession()
 {
   sessionStorage.removeItem(KEY);
+}
+
+export function saveLoginChallenge(username)
+{
+  sessionStorage.setItem(CHALLENGE_KEY, JSON.stringify({
+    username,
+    at: Date.now(),
+  }));
+}
+
+export function getLoginChallenge()
+{
+  const raw = sessionStorage.getItem(CHALLENGE_KEY);
+  if (!raw)
+  {
+    return null;
+  }
+  try
+  {
+    const challenge = JSON.parse(raw);
+    if (!challenge?.username)
+    {
+      clearLoginChallenge();
+      return null;
+    }
+    return challenge;
+  }
+  catch
+  {
+    clearLoginChallenge();
+    return null;
+  }
+}
+
+export function clearLoginChallenge()
+{
+  sessionStorage.removeItem(CHALLENGE_KEY);
 }
 
 export function getSession()

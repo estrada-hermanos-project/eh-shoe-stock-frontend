@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>Ingresar nueva contraseña | Estrada Hermanos</title>
+  <meta name="description" content="Defina una contraseña nueva para el panel — Estrada Hermanos." />
+  <link rel="icon" href="images/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div class="login" id="login">
+    <form class="login__card" id="reset-form" method="post" action="javascript:void(0)" autocomplete="on">
+      <img class="login__logo" src="images/logo.jpg" alt="Estrada Hermanos" />
+      <p class="login__brand">Estrada Hermanos</p>
+      <p class="login__tag">Calzado Fino de Occidente</p>
+      <p class="login__panel-label">Ingresar nueva contraseña</p>
+      <div class="field">
+        <label for="new-pass">Nueva Contraseña</label>
+        <input type="password" id="new-pass" name="new_password" autocomplete="new-password" autofocus />
+      </div>
+      <div class="field">
+        <label for="confirm-pass">Confirmar Nueva Contraseña</label>
+        <input type="password" id="confirm-pass" name="confirm_password" autocomplete="new-password" />
+      </div>
+      <label class="login__show-pass" for="show-pass">
+        <input type="checkbox" id="show-pass" />
+        Mostrar contraseña
+      </label>
+      <p class="login__error" id="reset-message" role="alert"></p>
+      <button class="btn btn--primary btn--block" type="submit" id="reset-submit">Cambiar Contraseña</button>
+      <a class="btn btn--ghost btn--block login__secondary" href="acceso.html">Iniciar Sesión</a>
+    </form>
+  </div>
+  <script type="module" src="js/nueva-contrasena.js"></script>
+</body>
+</html>

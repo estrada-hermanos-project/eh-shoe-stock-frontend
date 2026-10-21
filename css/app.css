@@ -104,6 +104,9 @@ button { font-family: inherit; cursor: pointer; }
   accent-color: var(--ink); cursor: pointer;
 }
 .login__hint { font-size: 0.9rem; color: var(--ink-soft); margin-top: 1rem; }
+.login__forgot { margin-top: 0.75rem; }
+.login__secondary { margin-top: 0.7rem; }
+.login__ok { color: var(--ok); font-size: 0.92rem; min-height: 1.2rem; margin: 0.4rem 0 0.8rem; }
 
 /* ============ BUTTONS ============ */
 .btn {
@@ -481,6 +484,8 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   .kpis { grid-template-columns: 1fr; }
   .topbar__search input { width: 140px; }
   .form-row { grid-template-columns: 1fr; }
+  .filters__actions { flex: 1 1 100%; }
+  .filters__actions .btn { flex: 1 1 8.5rem; min-width: 0; }
 }
 
 /* ============ TABS / WIZARD / EXTRA ============ */
@@ -493,6 +498,8 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 .tab.is-active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
 
 .filters { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; margin-bottom: 1.1rem; }
+.filters__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.filters .btn:disabled { opacity: 0.65; cursor: progress; }
 .filters .field { margin-bottom: 0; min-width: 140px; }
 .filters .field input, .filters .field select { min-width: 150px; }
 

@@ -33,84 +33,12 @@
       </label>
       <p class="login__error" id="login-error" role="alert"></p>
       <button class="btn btn--primary btn--block" type="submit" id="login-submit">Ingresar al panel</button>
+      <a class="btn btn--ghost btn--block btn--sm login__forgot" href="recuperacion.html">He olvidado mi contraseña</a>
       <p class="login__hint">Use el usuario de cuenta, no el correo. Ejemplo: diego.estrada</p>
       <a class="login__back" href="index.html">Volver al sitio</a>
     </form>
   </div>
   <div class="toast-wrap" id="toast-wrap"></div>
   <script type="module" src="js/acceso.js"></script>
-  <script type="module">
-    import { BACKEND_HOST } from "./js/config.js";
-    if (!window.__ehLoginBound)
-    {
-      var passInput = document.getElementById("pass");
-      var showPass = document.getElementById("show-pass");
-      if (passInput && showPass)
-      {
-        showPass.addEventListener("change", function ()
-        {
-          var value = passInput.value;
-          passInput.type = showPass.checked ? "text" : "password";
-          passInput.value = value;
-        });
-      }
-      document.getElementById("login-form").addEventListener("submit", function (event)
-      {
-        event.preventDefault();
-      });
-      document.getElementById("login-submit").addEventListener("click", async function ()
-      {
-        var errorEl = document.getElementById("login-error");
-        var submit = document.getElementById("login-submit");
-        var username = (document.getElementById("user").value || "").trim();
-        var password = passInput ? passInput.value : "";
-        if (!username || !password)
-        {
-          errorEl.textContent = "Ingrese usuario y contraseña.";
-          return;
-        }
-        var apiBase = localStorage.getItem("eh.apiBase") || (BACKEND_HOST + ":8080/api/v1");
-        var tokenHeader = localStorage.getItem("eh.authToken") || "local-auth-token";
-        submit.disabled = true;
-        submit.textContent = "Ingresando…";
-        errorEl.textContent = "";
-        try
-        {
-          var response = await fetch(apiBase + "/auth/login", {
-            method: "POST",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-              "auth-token": tokenHeader
-            },
-            body: JSON.stringify({ username: username, password: password })
-          });
-          var payload = await response.json().catch(function () { return {}; });
-          if (!response.ok || !payload.data || !payload.data.token)
-          {
-            errorEl.textContent = payload.message === "Invalid credentials"
-              ? "Usuario o contraseña incorrectos"
-              : (payload.message || "No se pudo iniciar sesión.");
-            return;
-          }
-          sessionStorage.setItem("eh.session", JSON.stringify({
-            token: payload.data.token,
-            username: username,
-            at: Date.now()
-          }));
-          window.location.replace("app.html#/dashboard");
-        }
-        catch (err)
-        {
-          errorEl.textContent = "No se pudo conectar con el servidor. Verifique que el backend esté en marcha.";
-        }
-        finally
-        {
-          submit.disabled = false;
-          submit.textContent = "Ingresar al panel";
-        }
-      });
-    }
-  </script>
 </body>
 </html>
