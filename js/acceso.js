@@ -1,4 +1,5 @@
-import { BACKEND_HOST } from "./config.js";
+import { AuthApi } from "./api.js";
+import { saveLoginChallenge } from "./session.js";
 
 (function ()
 {
@@ -11,8 +12,6 @@ import { BACKEND_HOST } from "./config.js";
     return;
   }
 
-  window.__ehLoginBound = true;
-
   const passInput = document.getElementById("pass");
   const showPass = document.getElementById("show-pass");
   if (passInput && showPass)
@@ -23,30 +22,6 @@ import { BACKEND_HOST } from "./config.js";
       passInput.type = showPass.checked ? "text" : "password";
       passInput.value = value;
     });
-  }
-
-  function apiBase()
-  {
-    const stored = localStorage.getItem("eh.apiBase");
-    if (stored)
-    {
-      return stored;
-    }
-    return BACKEND_HOST + ":8080/api/v1";
-  }
-
-  function authToken()
-  {
-    return localStorage.getItem("eh.authToken") || "local-auth-token";
-  }
-
-  function saveSession(token, username)
-  {
-    sessionStorage.setItem(KEY, JSON.stringify({
-      token: token,
-      username: username,
-      at: Date.now(),
-    }));
   }
 
   function existingSession()
@@ -96,36 +71,17 @@ import { BACKEND_HOST } from "./config.js";
     submit.textContent = "Ingresando…";
     try
     {
-      const response = await fetch(apiBase() + "/auth/login", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "auth-token": authToken(),
-        },
-        body: JSON.stringify({ username: username, password: password }),
-      });
-      const payload = await response.json().catch(function () { return {}; });
-      if (!response.ok)
+      const data = await AuthApi.login(username, password);
+      if (!data || !data.second_step_required)
       {
-        const message = payload.message === "Invalid credentials"
-          ? "Usuario o contraseña incorrectos"
-          : (payload.message === "Invalid or missing auth-token header"
-            ? "No se pudo validar el acceso al servidor"
-            : (payload.message || "No se pudo iniciar sesión."));
-        throw new Error(message);
+        throw new Error("No se pudo iniciar sesión.");
       }
-      const token = payload.data && payload.data.token;
-      if (!token)
-      {
-        throw new Error("El servidor no devolvió la sesión.");
-      }
-      saveSession(token, username);
-      window.location.replace("app.html#/dashboard");
+      saveLoginChallenge(username);
+      window.location.replace("codigo.html");
     }
     catch (err)
     {
-      errorEl.textContent = err && err.message && err.message !== "Failed to fetch"
+      errorEl.textContent = err && err.message
         ? err.message
         : "No se pudo conectar con el servidor. Verifique que el backend esté en marcha.";
       inflight = false;

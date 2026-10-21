@@ -45,7 +45,10 @@ export async function renderReportes(root, ctx)
           ${suppliers.map((s) => `<option value="${s.id}" ${String(s.id) === String(supplierId) ? "selected" : ""}>${escapeHtml(s.name)}</option>`).join("")}
         </select></div>
       <button class="btn btn--primary btn--sm" id="r-apply">Aplicar</button>
-      <button class="btn btn--gold btn--sm" type="button" id="r-pdf">${I.pdf} Descargar PDF</button>
+      <div class="filters__actions">
+        <button class="btn btn--gold btn--sm" type="button" id="r-pdf">${I.pdf} Descargar PDF</button>
+        <button class="btn btn--ghost btn--sm" type="button" id="r-email">Enviar a correo</button>
+      </div>
     </div>
     <div class="tabs">${TABS.map((t) =>
       `<button class="tab ${tab === t.id ? "is-active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}</div>
@@ -79,6 +82,30 @@ export async function renderReportes(root, ctx)
       subtitle: `Período ${start} a ${end} · Tipo: ${typeLabel} · Proveedor: ${supplierLabel} · Generado ${todayIso()}`,
     });
   });
+  const emailBtn = $("#r-email", root);
+  emailBtn.addEventListener("click", async () =>
+  {
+    if (emailBtn.disabled)
+    {
+      return;
+    }
+    emailBtn.disabled = true;
+    emailBtn.textContent = "Enviando…";
+    try
+    {
+      await ReportsApi.sendEmail(emailBody(tab, report, ctx, root));
+      toast("El reporte fue enviado a su correo");
+    }
+    catch (err)
+    {
+      toast(err && err.message ? err.message : "No se pudo enviar el reporte por correo", "error");
+    }
+    finally
+    {
+      emailBtn.disabled = false;
+      emailBtn.textContent = "Enviar a correo";
+    }
+  });
 
   const body = $("#r-body", root);
   const filters = cleanParams({
@@ -111,6 +138,54 @@ export async function renderReportes(root, ctx)
     body.innerHTML = bannerError(err.message);
     $("[data-retry]", body)?.addEventListener("click", () => ctx.reload());
   }
+}
+
+const EMAIL_REPORTS = {
+  resumen: {
+    "": { report: "summary" },
+  },
+  ventas: {
+    top: { report: "sales", sub_report: "top-products", limit: 10 },
+    bottom: { report: "sales", sub_report: "bottom-products", limit: 10 },
+    period: { report: "sales", sub_report: "by-period" },
+    cat: { report: "sales", sub_report: "by-category" },
+    size: { report: "sales", sub_report: "by-size" },
+    sup: { report: "sales", sub_report: "by-supplier" },
+    vol: { report: "sales", sub_report: "volume", group_by: "DAY" },
+  },
+  inventario: {
+    estado: { report: "inventory", sub_report: "status", include_out_of_stock: true },
+    grupo: { report: "inventory", sub_report: "by-group", group_by: "TYPE" },
+    bajo: { report: "inventory", sub_report: "low-stock" },
+    agotado: { report: "inventory", sub_report: "out-of-stock" },
+    lento: { report: "inventory", sub_report: "slow-movers" },
+    pedir: { report: "inventory", sub_report: "restock" },
+  },
+  mercaderia: {
+    pendientes: { report: "merchandise", sub_report: "pending" },
+    recibidos: { report: "merchandise", sub_report: "received" },
+    sup: { report: "merchandise", sub_report: "by-supplier" },
+    vs: { report: "merchandise", sub_report: "vs-sales" },
+    nosale: { report: "merchandise", sub_report: "not-selling" },
+  },
+};
+
+function emailBody(tab, report, ctx, root)
+{
+  const catalog = EMAIL_REPORTS[tab] || EMAIL_REPORTS.resumen;
+  const kind = catalog[report] || catalog[""] || Object.values(catalog)[0];
+  const supplier = $("#r-sup", root).value;
+  return cleanParams({
+    report: kind.report,
+    sub_report: kind.sub_report,
+    start_date: $("#r-start", root).value,
+    end_date: $("#r-end", root).value,
+    type: $("#r-type", root).value,
+    supplier_id: supplier ? Number(supplier) : undefined,
+    limit: kind.limit,
+    group_by: kind.group_by ? (ctx.params.get("group") || kind.group_by) : undefined,
+    include_out_of_stock: kind.include_out_of_stock,
+  });
 }
 
 function defaultReport(tab)
