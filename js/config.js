@@ -1,4 +1,4 @@
-export const BACKEND_HOST = "http://13.221.158.41";
+export const BACKEND_HOST = "http://184.193.230.77";
 
 function defaultApiBase()
 {
