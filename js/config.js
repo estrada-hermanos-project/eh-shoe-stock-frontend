@@ -1,4 +1,4 @@
-export const BACKEND_HOST = "http://184.193.230.77";
+export const BACKEND_HOST = "https://d1pgzyoqrjk0bx.cloudfront.net";
 
 function defaultApiBase()
 {
@@ -7,7 +7,7 @@ function defaultApiBase()
   {
     return stored;
   }
-  return `${BACKEND_HOST}:8080/api/v1`;
+  return `${BACKEND_HOST}/api/v1`;
 }
 
 export const CONFIG = {
